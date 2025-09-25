@@ -8,3 +8,8 @@ services:
     - key: BOT_TOKEN
       sync: false
   pythonVersion: 3.10.13
+
+
+
+
+type: web
