@@ -1,26 +1,20 @@
-from flask import Flask
-from telegram import Bot, Update
-from telegram.ext import Dispatcher, CommandHandler
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
 
-# --- Setup Flask ---
-app = Flask(__name__)
+# Bot command handler
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("King Voldus Bot is now active.")
 
-@app.route('/')
-def index():
-    return 'King Voldus Bot is running.'
-
-# --- Telegram Bot Setup ---
-TOKEN = os.environ.get("8128245543:AAFOZIk-NQD8ROABln-JjywZKpqbuWvdVUA")
-bot = Bot(token=TOKEN)
-dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0, use_context=True)
-
-def start(update, context):
-    update.message.reply_text('Voldus bot activated.')
-
-dispatcher.add_handler(CommandHandler("start", start))
-
-# --- Polling (Alternative to webhook) ---
+# Entry point
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    TOKEN = os.environ.get("BOT_TOKEN")
+
+    if not TOKEN:
+        raise Exception("BOT_TOKEN not found in environment variables")
+
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+
+    print("Bot is running...")
+    app.run_polling()
