@@ -1,19 +1,26 @@
-from telegram.ext import Updater, CommandHandler
-from keep_alive import keep_alive
+from flask import Flask
+from telegram import Bot, Update
+from telegram.ext import Dispatcher, CommandHandler
+import os
 
-# Replace with your bot token
-BOT_TOKEN = "8128245543:AAFOZIk-NQD8ROABln-JjywZKpqbuWvdVUA"
+# --- Setup Flask ---
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return 'King Voldus Bot is running.'
+
+# --- Telegram Bot Setup ---
+TOKEN = os.environ.get("8128245543:AAFOZIk-NQD8ROABln-JjywZKpqbuWvdVUA")
+bot = Bot(token=TOKEN)
+dispatcher = Dispatcher(bot=bot, update_queue=None, workers=0, use_context=True)
 
 def start(update, context):
-    update.message.reply_text("✅ Bot is alive!")
+    update.message.reply_text('Voldus bot activated.')
 
-keep_alive()
+dispatcher.add_handler(CommandHandler("start", start))
 
-updater = Updater(BOT_TOKEN, use_context=True)
-dp = updater.dispatcher
-
-dp.add_handler(CommandHandler("start", start))
-
-print("✅ Bot is running and polling...")
-updater.start_polling()
-updater.idle()
+# --- Polling (Alternative to webhook) ---
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
